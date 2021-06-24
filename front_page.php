@@ -65,7 +65,7 @@
                                 <button type="submit" class="btn btn-success">View</button>
                             </form>
 
-                            <form action="test.php" style="display: inline-block;" method="POST">
+                            <form action="update.php" style="display: inline-block;" method="POST">
                                 <input type="hidden" name="id" value="<?php echo $key['id'] ?>">
                                 <button type="submit" class="btn btn-sm btn-outline-success">Edit</button>
                             </form>
