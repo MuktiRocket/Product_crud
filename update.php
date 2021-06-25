@@ -2,11 +2,14 @@
 $id = '';
 $get_id = '';
 $imagename = '';
-
+$image = '';
+$description = '';
 $errors = [];
+$newimage = '';
+$count = 0;
 include_once("connection.php");
-if (isset($_POST['id'])) {
-    $id = $_POST['id'];
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
 }
 
 $statement = $pdo->prepare('SELECT * FROM products WHERE id = :id');
@@ -18,6 +21,8 @@ $products = $statement->fetch();
 $title = $products['title'];
 $description = $products['description'];
 $price = $products['price'];
+$newimage = $products['image'];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,7 +45,7 @@ $price = $products['price'];
 </head>
 
 <body>
-    <h1>Update Product <b><?php echo $products['title'] ?></b></h1>
+    <h1>Update Product <b><?php echo $title ?></b></h1>
     <?php
     if (!empty($errors)) { ?>
         <?php
@@ -77,7 +82,7 @@ $price = $products['price'];
         <br>
         <div class="form-group">
             <label>Product Description</label>
-            <textarea class="form-control" name="description" value="<?php echo $description ?>"></textarea>
+            <textarea class="form-control" name="description"><?php echo $description ?></textarea>
         </div><br>
         <div class="form-group">
             <label>Product Price</label>
@@ -112,61 +117,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['price'])) {
         $price = $_POST['price'];
     }
-    $image = isset($_FILES['image']);
-    // if ($title === "") {
-    //     array_push($errors, 'Need to Write Title');
-    // }
-
-    // if (!$price) {
-    //     array_push($errors, 'Need to Write price');
-    // }
-    // if (!is_dir('MYimages')) {
-    //     mkdir('MYimages');
-    // }
+    if (isset($_FILES['image'])) {
+        $image = $_FILES['image'];
+    }
 
 
-    // if ($image) {
-    //     if ($products['image']) {
-    //         unlink($products['image']);
-    //     }
-    //     $imagename = 'MYimages/' . randomString(5) . '/' . $image['name'];
-    //     mkdir(dirname($imagename));
-    //     move_uploaded_file($image['tmp_name'], $imagename);
-    // }
+    if ($title === "") {
+        array_push($errors, 'Need to Write Title');
+    }
 
-    // if (empty($errors)) {
-
-    // $imagename = $products['image'];
-
-    // if ($image && $image['tmp_name']) {
-
-    //     if ($products['image']) {
-    //         unlink($products['image']);
-    //     }
-    //     $imagename = '';
-
-    //     $imagename = 'MYimages/' . randomstring(5) . '/' . $image['name'];
-    //     mkdir(dirname($imagename));
-    //     move_uploaded_file($image['tmp_name'], $imagename);
-    // }
-    // $statement = $pdo->prepare("UPDATE `products` (title, image, description, price)
-    // VALUES(:title, :image, :description, :price) WHERE `:id`=$id");
-    // echo $id;
-    // die;
-    $statement = $pdo->prepare("UPDATE `products` SET `title` = :title, `description` = :description, `price` = :price WHERE `id` = :id ");
-    // print_r($statement);
-    // die;
-    $statement->bindValue(':title', $title);
-    //$statement->bindValue(':image', $imagename);
-    $statement->bindValue(':description', $description);
-    $statement->bindValue(':price', $price);
-    $statement->bindValue(':id', $get_id);
+    if (!$price) {
+        array_push($errors, 'Need to Write price');
+    }
 
 
-    $statement->execute();
-    // header("Location: http://localhost/Project_training/front_page.php");
+    if (empty($errors)) {
+        $imagename = $products['image'];
+
+        if (!empty($image['name'])) {
+            $catchimage = $image['name'];
+            print_r($catchimage);
+
+            $imagename = 'xyz/' . $catchimage;
+            move_uploaded_file($image['tmp_name'], $imagename);
+        } else {
+
+            $statement = $pdo->prepare("UPDATE `products` SET `title` = :title, `description` = :description, `price` = :price WHERE `id` = :id ");
+            $statement->bindValue(':title', $title);
+            $statement->bindValue(':description', $description);
+            $statement->bindValue(':price', $price);
+            $statement->bindValue(':id', $get_id);
+            $statement->execute();
+
+            $imagename = $newimage;
+
+            header("Location: front_page.php");
+            die;
+        }
+
+
+        $statement = $pdo->prepare("UPDATE `products` SET `title` = :title, `description` = :description, `price` = :price, `image`= :image WHERE `id` = :id ");
+        $statement->bindValue(':title', $title);
+        $statement->bindValue(':image', $imagename);
+        $statement->bindValue(':description', $description);
+        $statement->bindValue(':price', $price);
+        $statement->bindValue(':id', $get_id);
+        $statement->execute();
+
+
+        header("Location: front_page.php");
+    }
 }
-// }
 
 
 

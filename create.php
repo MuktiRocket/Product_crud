@@ -68,8 +68,8 @@
         if (!$price) {
             array_push($errors, 'Need to Write price');
         }
-        if (!is_dir('MYimages')) {
-            mkdir('MYimages');
+        if (!is_dir('xyz')) {
+            mkdir('xyz');
         }
 
         if (empty($errors)) {
@@ -77,7 +77,7 @@
             $image = $_FILES['image'] ?? null;
 
             if ($image && $image['tmp_name']) {
-                $imagename = 'MYimages/' . randomstring(5) . '/' . $image['name'];
+                $imagename = 'xyz/' . randomstring(5) . '/' . $image['name'];
                 mkdir(dirname($imagename));
                 move_uploaded_file($image['tmp_name'], $imagename);
             }
